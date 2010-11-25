@@ -1,0 +1,733 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ben.IA.brain.scripter;
+
+import com.ben.IA.ErrorLogger.ScriptErrorException;
+import com.ben.IA.Views.utilities.Scripter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.StringTokenizer;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author benoitdaccache
+ */
+public class Interpreter extends Thread implements Runnable {
+
+    static synchronized void putInBuffer(String a, Object o) throws ScriptErrorException {
+        checkIsKeyWordOrTrueFalse(a);
+        buffer.put(a, o);
+    }
+//faire la lecture des vecteurs et aussi la compairason boolean et a=b[i] et liste??
+    private static HashMap buffer;
+    private Scripter console;
+    static String[] sym = new String[]{"+", "-", "*", "/", "%"};
+    static String[] opB = new String[]{"==", "<=", ">=", "<", ">", "!="};
+    static String[] keyWord = new String[]{"if", "else", "end", "endif", "while", "endwhile", "thread", "endthread"};
+    private Reader reader;
+    private ArrayList<Thread> threadList;
+
+    public Interpreter(Reader reader, Scripter frame) {
+        super();
+        buffer = new HashMap();
+        threadList = new ArrayList<Thread>();
+        this.console = frame;
+        this.reader = reader;
+        Interpreter.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+
+            public void uncaughtException(Thread t, Throwable e) {
+                //console.appendToConsole(e.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void run() {
+        startInterpret(reader);
+    }
+
+    private void startInterpret(Reader reader) {
+        program(reader);
+        if (threadList.size() == 0) {
+            console.markstop();
+        }
+    }
+
+    private void program(Reader reader) {
+        try {
+            checkBegin(reader.readLine());
+            seqInst(reader);
+            checkEnd(reader.readLine());
+        } catch (ScriptErrorException e) {
+            console.appendToConsole(e.getMessage());
+        }
+    }
+
+    private void seqInst(Reader reader) throws ScriptErrorException {
+        do {
+            String r = reader.readLine().trim();
+            if (!r.equals("")) {
+                inst(r, reader);
+            }
+        } while (!reader.nextLine().equals("end") && reader.canRead());
+    }
+
+    private void inst(String readLine, Reader reader) throws ScriptErrorException {
+        if (isVectAffectation(readLine)) {
+            VectAffectation(readLine, reader);
+        } else if (isRead(readLine)) {
+            read(readLine);
+        } else if (isWrite(readLine)) {
+            write(readLine);
+        } else if (Functor.isSleep(readLine)) {
+            Functor.sleep(readLine);
+        } else if (Functor.isOsTime(readLine)) {
+            Functor.osTime(readLine);
+        } else if (Files.isFileOperation(readLine)) {
+            Files.performFileOperation(readLine, buffer);
+        } else if (isThread(readLine)) {
+            thread(reader);
+        } else if (isLoop(readLine)) {
+            loop(readLine, reader);
+        } else if (isCondition(readLine)) {
+            condition(readLine, reader);
+        } else if (isAffectation(readLine)) {
+            affectation(readLine);
+        } else if (isDeclaration(readLine)) {
+            declaration(readLine);
+        } else {
+            throw new ScriptErrorException("<Syntax error: expected instruction>");
+        }
+    }
+
+    private void VectAffectation(String readLine, Reader reader) throws ScriptErrorException {
+        String var = readLine.substring(0, readLine.indexOf("["));//nom de la variable
+        String item = readLine.substring(readLine.indexOf("[") + 1, readLine.indexOf("]")).trim();
+        String e = readLine.substring(readLine.indexOf("=") + 1).trim();//nouvellevaleur
+       /* try {
+        if (isNumber(item)) {//si l'indice est un entier
+        if (buffer.containsKey(var)) {
+        if (buffer.get(var) instanceof Object[]) {
+        Object[] o = (Object[]) buffer.get(var);
+        if (buffer.containsKey(e)) {
+        o[(int)Long.parseLong(item)] = buffer.get(e);
+        } else {
+        o[(int)Long.parseLong(item)] = e;
+        }
+        } else {
+        throw new ScriptErrorException("<Error: variable " + var + " is not a vector>");
+        }
+        }
+        } else if (buffer.containsKey(item)) {//si c'est une variable
+        if (buffer.containsKey(var)) {
+        if (buffer.get(var) instanceof Object[]) {
+        Object[] o = (Object[]) buffer.get(var);
+        if (buffer.containsKey(e)) {
+        int g = (int)Long.parseLong((String) buffer.get(item));
+        o[g] = (String) buffer.get(e);
+        } else {
+        o[(int)Long.parseLong((String) buffer.get(item))] = e;
+        }
+        } else {
+        throw new ScriptErrorException("<Error: variable " + var + " is not a vector>");
+        }
+        }
+        } else {
+        throw new ScriptErrorException("<Error: expected digit");
+        }
+        } catch (NumberFormatException e1) {
+        throw new ScriptErrorException("<Error: Expected integer>");
+        }*/
+        if (buffer.containsKey(var)) {
+            if (buffer.get(var) instanceof Object[]) {
+                Object[] o = (Object[]) buffer.get(var);
+                long i = (Long) getVar(item);
+                try {
+                    Object o1 = getVar(e);
+                    o[(int) i] = o1;
+                } catch (IndexOutOfBoundsException ez) {
+                    throw new ScriptErrorException("<Error: Array out of bounds>");
+                }
+            } else {
+                throw new ScriptErrorException("<Error: variable " + var + " is not a vector>");
+            }
+        } else {
+            throw new ScriptErrorException("<Error: variable " + var + " does not exist>");
+        }
+
+    }
+    /**
+     *
+     * @return la valeur du parametre ou la valeur de la variable si c'est une variable
+     */
+    private Object getVar(String s) throws ScriptErrorException {
+        String varName;
+        if (s.contains("[") && s.contains("]")) {
+            varName = s.substring(0, s.indexOf("["));
+            String v = s.substring(s.indexOf("[") + 1, s.indexOf("]")).trim();
+            long item;
+            try {
+                if (buffer.containsKey(v)) {
+                    item = ((Long)buffer.get(v));
+                } else {
+                    item = Long.parseLong(v);
+                }
+                if (buffer.get(varName) instanceof Object[]) {
+                    return ((Object[]) buffer.get(varName))[(int) item];
+                } else {
+                    throw new ScriptErrorException("<Error expected vector>");
+                }
+            } catch (NumberFormatException e) {
+                throw new ScriptErrorException("<Error: expected int>");
+            } catch (ArrayIndexOutOfBoundsException e2) {
+                throw new ScriptErrorException("<Error: Array out of bounds>");
+            }
+
+        } else if (buffer.containsKey(s)) {
+            Object o = buffer.get(s);
+            return o;
+        } else {
+            if (isString(s)) {
+                return s.substring(1, s.length() - 1);
+            } else if (isNumber(s)) {
+                return Long.parseLong(s);
+            } else {
+                throw new ScriptErrorException("<Error: expected String or value>");
+            }
+        }
+    }
+
+    private void condition(String readLine, Reader reader) throws ScriptErrorException {
+        if (!isOpBool(readLine)) {
+            throw new ScriptErrorException("<Error: expected boolean>");
+        }
+        int i = readLine.indexOf("if ");
+        String opBool = readLine.substring(i + 3).trim();
+        if (!opBool(opBool)) {
+            skipToElseOrEndIf(reader);
+        } else {
+            executeCondition(reader);
+        }
+    }
+
+    private boolean evaluateBoolean(Object var1, Object var2, String op) throws ScriptErrorException {
+        try {
+            if (var1 instanceof Long) {
+                if (op.equals("==")) {
+                    return var1 == var2;
+                } else if (op.equals("<=")) {
+                    return (Long) var1 <= (Long) var2;
+                } else if (op.equals(">=")) {
+                    return (Long) var1 >= (Long) var2;
+                } else if (op.equals("<")) {
+                    return (Long) var1 < (Long) var2;
+                } else if (op.equals(">")) {
+                    return (Long) var1 > (Long) var2;
+                } else if (op.equals("!=")) {
+                    return (Long) var1 != (Long) var2;
+                }
+            } else if (var1 instanceof String) {
+                if (op.equals("==")) {
+                    return var1.equals(var2);
+                } else if (op.equals("<=")) {
+                    return ((String) var1).compareTo((String) var2) <= 0;
+                } else if (op.equals(">=")) {
+                    return ((String) var1).compareTo((String) var2) >= 0;
+                } else if (op.equals("<")) {
+                    return ((String) var1).compareTo((String) var2) < 0;
+                } else if (op.equals(">")) {
+                    return ((String) var1).compareTo((String) var2) > 0;
+                } else if (op.equals("!=")) {
+                    return !((String) var1).equals(var2);
+                }
+            }
+            throw new ScriptErrorException("<Error: expected boolean condition>");
+        } catch (ClassCastException e) {
+            throw new ScriptErrorException("<Error: cannot compare>");
+        }
+    }
+
+    private void executeCondition(Reader reader) throws ScriptErrorException {
+        do {
+            String r = reader.readLine().trim();
+            if (!r.equals("")) {
+                inst(r, reader);
+            }
+        } while ((!reader.nextLine().equals("endif") && !reader.nextLine().equals("else")) && reader.canRead());
+        checkEndOrElse(reader.readLine(), reader);
+    }
+
+    private void executeElse(Reader reader) throws ScriptErrorException {
+        do {
+            String r = reader.readLine().trim();
+            if (!r.equals("")) {
+                inst(r, reader);
+            }
+        } while (!reader.nextLine().equals("endif") && reader.canRead());
+        if (!reader.readLine().equals("endif")) {
+            throw new ScriptErrorException("<Error: expected endif>");
+        }
+    }
+
+    private void executeLoop(Reader reader) throws ScriptErrorException {
+        do {
+            String r = reader.readLine().trim();
+            if (!r.equals("")) {
+                inst(r, reader);
+            }
+        } while (!reader.nextLine().equals("endwhile") && reader.canRead());
+        checkEndWhile(reader.readLine());
+    }
+
+    private String getThreadedInst(Reader reader) {
+        StringBuilder b = new StringBuilder();
+        while (!reader.nextLine().equals("endthread")) {
+            b.append(reader.readLine() + "\n");
+        }
+        b.append(reader.readLine());
+        return b.toString();
+    }
+
+    private void loop(String readLine, Reader reader) throws ScriptErrorException {
+        //<loop>:= while <opBool> <seqInst> end
+        //stocker les instructions dans le loop
+        String tmp = getLoopInst(reader);
+        int i = readLine.indexOf("while") + "while".length();
+        String opBool = readLine.substring(i).trim();
+        while (opBool(opBool)) {
+            Reader tmpReader = new Reader(tmp);
+            executeLoop(tmpReader);
+        }
+
+    }
+
+    private boolean opBool(String exp) throws ScriptErrorException {
+        String op = getOpBool(exp);
+        int i = exp.indexOf(op);
+        String var1 = exp.substring(0, i).trim();
+        String var2 = exp.substring(i + op.length()).trim();
+        Object o = getVar(var1);
+        Object o2 = getVar(var2);
+        return evaluateBoolean(o, o2, op);
+    }
+
+    private Long operate(long z1, long z2, String op) {
+        switch (op.charAt(0)) {
+            case '+':
+                return z1 + z2;
+            case '-':
+                return z1 - z2;
+            case '/':
+                return z1 / z2;
+            case '*':
+                return z1 * z2;
+            case '%':
+                return z1 % z2;
+        }
+        return null;
+    }
+
+    private void seqInstThread(Reader reader) throws ScriptErrorException {
+        do {
+            String r = reader.readLine().trim();
+            if (!r.equals("")) {
+                inst(r, reader);
+            }
+        } while (!reader.nextLine().equals("endthread") && reader.canRead());
+        checkEndThread(reader.readLine());
+    }
+
+    private void skipToElseOrEndIf(Reader reader) throws ScriptErrorException {
+        String r = reader.readLine().trim();
+        while (!r.equals("endif") && !r.equals("else") && reader.canRead()) {
+            r = reader.readLine().trim();
+        }
+        if (r.equals("else")) {
+            executeElse(reader);
+        } else if (!r.equals("endif")) {
+            throw new ScriptErrorException("<Error: expected endif>");
+        }
+
+    }
+
+    private void declaration(String readLine) throws ScriptErrorException {
+        String tmp = readLine.trim();
+        checkIsKeyWordOrTrueFalse(tmp);
+        if (tmp.contains(" ")) {
+            throw new ScriptErrorException("<Syntax Error: expected variable>");
+        } else if (buffer.get(tmp) != null) {
+            throw new ScriptErrorException("<Error: variable " + tmp + " already exists>");
+        } else if (readLine.contains("[") && readLine.contains("]")) {
+            String var = readLine.substring(0, readLine.indexOf("["));
+            String length = readLine.substring(readLine.indexOf("[") + 1, readLine.indexOf("]"));
+            if (isNumber(length)) {
+                buffer.put(var, new Object[(int) Long.parseLong(length)]);
+            } else if (buffer.containsKey(length)) {
+                long l = (Long) buffer.get(length);
+                buffer.put(var, new Object[(int) l]);
+            } else {
+                throw new ScriptErrorException("<Error: expected digit");
+            }
+        } else {
+            buffer.put(tmp, null);
+        }
+    }
+
+    private boolean isOpBin(String s) {
+        for (int i = 0; i < sym.length; i++) {
+            if (s.contains(sym[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void postFixIncrementation(String readLine) throws ScriptErrorException {
+        int index = readLine.indexOf("++");
+        String s = readLine.substring(0, index).trim();
+        try {
+            if (!buffer.containsKey(s)) {
+                throw new ScriptErrorException("<Syntax error: expected variable");
+            } else {
+                long val = ((Long) buffer.get(s));
+                buffer.put(s, ++val);
+                return;
+            }
+        } catch (ClassCastException e) {
+            throw new ScriptErrorException("<Error: expected int>");
+        }
+    }
+
+    private void postFixDecrementation(String readLine) throws ScriptErrorException {
+        int index = readLine.indexOf("--");
+        String s = readLine.substring(0, index).trim();
+        try {
+            if (!buffer.containsKey(s)) {
+                throw new ScriptErrorException("<Syntax error: expected variable");
+            } else {
+                long val = ((Long) buffer.get(s));
+                buffer.put(s, --val);
+                return;
+            }
+        } catch (ClassCastException e) {
+            throw new ScriptErrorException("<Error: expected int>");
+        }
+    }
+
+    public String removeSpaces(String s) {
+        StringTokenizer st = new StringTokenizer(s, " ", false);
+        String t = "";
+        while (st.hasMoreElements()) {
+            t += st.nextElement();
+        }
+        return t;
+    }
+
+    private void affectation(String readLine) throws ScriptErrorException {
+        if (readLine.contains("[") && readLine.contains("]")) {
+            String var = readLine.substring(0, readLine.indexOf("="));
+        } else if (readLine.contains("newfile(")) {
+            Files.newFile(readLine, buffer);
+            return;
+        } else if (readLine.contains("++")) {
+            postFixIncrementation(readLine);
+            return;
+        } else if (readLine.contains("--")) {
+            postFixDecrementation(readLine);
+            return;
+        }
+        int i = readLine.indexOf("=");
+        String var1 = readLine.substring(0, i).trim();
+        String var2 = readLine.substring(i + 1).trim();
+        checkIsKeyWordOrTrueFalse(var1);
+        checkIsKeyWord(var2);
+        if (isOpBool(readLine)) {
+            int in = readLine.indexOf("=");
+            boolean res = opBool(readLine.substring(in + 1).trim());
+            var1 = readLine.substring(0, in).trim();
+            buffer.put(var1, res);
+            return;
+        } else if (removeSpaces(readLine).contains("=-")) {
+            String nospace = removeSpaces(readLine);
+            var1 = nospace.substring(0, nospace.indexOf("=-"));
+            var2 = nospace.substring(nospace.indexOf("=-") + 2);
+            checkIsKeyWordOrTrueFalse(var1);
+            checkIsKeyWord(var2);
+            try {
+                long varv = (Long) getVar(var2);
+                buffer.put(var1, -varv);
+            } catch (ClassCastException cx) {
+                throw new ScriptErrorException("<Error: expected number>");
+            }
+            return;
+        } else if (isOpBin(readLine)) {
+            int a = 0;
+            do {
+                i = var2.indexOf(sym[a]);
+                a++;
+            } while (i == -1);
+            String op = sym[a - 1];
+            String tmp = var2;
+            var2 = var2.substring(0, i).trim();
+            String var3 = tmp.substring(i + 1).trim();
+            var1 = var1.trim();
+            //aditionner var2 et var3 puis mettre la valeur dans var1
+            long z1, z2;
+            z1 = getOperandOrVariableValue(var2);
+            z2 = getOperandOrVariableValue(var3);
+            long res = operate(z1, z2, op);
+            buffer.put(var1, res);
+            return;
+        } else {
+            var1 = var1.trim();
+            var2 = var2.trim();
+            if (isNumber(var2)) {
+                buffer.put(var1, Long.parseLong(var2));
+            } else {
+                if (isString(var2)) {
+                    buffer.put(var1, var2.substring(1, var2.length() - 1));
+                } else if (var2.equals("true") || var2.equals("false")) {
+                    buffer.put(var1, var2);
+                } else if (buffer.get(var2) != null) {
+                    buffer.put(var1, buffer.get(var2));
+                } else {
+                    throw new ScriptErrorException("<Error: variable " + var2 + " not initialized>");
+                }
+            }
+        }
+
+    }
+
+    private long getOperandOrVariableValue(String var) throws ScriptErrorException {
+        if (isNumber(var)) {
+            return Long.parseLong(var);
+        } else {
+            if (!buffer.containsKey(var)) {
+                throw new ScriptErrorException("<Error: variable " + var + " doesen't exits>");
+            } else {
+                try {
+                    return ((Long) buffer.get(var));
+                } catch (ClassCastException e) {
+                    throw new ScriptErrorException("<Error: Incompatible types>");
+                }
+            }
+        }
+    }
+
+    private void thread(Reader reader) throws ScriptErrorException {
+        final Reader r = new Reader(getThreadedInst(reader));
+        Runnable run = new Runnable() {
+
+            public void run() {
+                try {
+                    seqInstThread(r);
+                    if (threadList.size() == 0) {
+                        console.markstop();
+                    }
+                } catch (ScriptErrorException ex) {
+                    console.appendToConsole(ex.getMessage());
+                    stopInterpreter();
+                }
+            }
+        };
+        Thread t = new Thread(run);
+        threadList.add(t);
+        t.start();
+    }
+
+    private void stopInterpreter() {
+        for(int i=0; i<threadList.size();i++)
+            threadList.get(i).interrupt();
+        this.interrupt();
+    }
+
+    private void write(String readLine) throws ScriptErrorException {
+        int i = readLine.indexOf("(");
+        int j = readLine.indexOf(")");
+        String temp = readLine.substring(i + 1, j).trim();
+        if (isOpBool(readLine)) {
+            boolean res = opBool(temp);
+            console.appendToConsole(Boolean.toString(res));
+        } else {
+            Object c = getVar(temp);
+            if (c == null) {
+                console.appendToConsole("null");
+            } else {
+                console.appendToConsole(c.toString());
+            }
+        }
+    }
+
+    private void read(String readLine) throws ScriptErrorException {
+        int i = readLine.indexOf("(");
+        int j = readLine.indexOf(")");
+        String var = readLine.substring(i + 1, j);
+        var = var.trim();
+        if (var.contains(" ") || isFirstDigit(var)) {
+            throw new ScriptErrorException("<Syntax Error: expected variable>");
+        }
+        checkIsKeyWordOrTrueFalse(var);
+        String r = JOptionPane.showInputDialog("enter value:");
+        if (isNumber(r)) {
+            buffer.put(var, Long.parseLong(r));
+        } else {
+            buffer.put(var, r);
+        }
+    }
+
+    private boolean isFirstDigit(String s) {
+        return Character.isDigit(s.charAt(0));
+    }
+
+    private boolean isAffectation(String readLine) {
+        return !Character.isDigit(readLine.charAt(0)) && ((readLine.contains("=") || readLine.contains("++") || readLine.contains("--") && readLine.length() > 2));
+    }
+
+    private boolean isRead(String readLine) {
+        return readLine.startsWith("read(");
+    }
+
+    private boolean isWrite(String readLine) {
+        return readLine.startsWith("write(");
+    }
+
+    private boolean isDeclaration(String readLine) {
+        return !Character.isDigit(readLine.charAt(0)) && !readLine.contains("=");
+    }
+
+    private boolean isCondition(String readLine) {
+        return readLine.startsWith("if ");
+    }
+
+    private boolean isLoop(String readLine) {
+        return readLine.startsWith("while ");
+    }
+
+    private boolean isNumber(String var2) {
+        try {
+            Long.parseLong(var2.trim());
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isOpBool(String readLine) {
+        for (int i = 0; i < opB.length; i++) {
+            if (readLine.contains(opB[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isString(String var2) {
+        return var2.contains("\"");
+    }
+
+    private boolean isThread(String readLine) {
+        return readLine.equals("thread");
+    }
+
+    private boolean isVectAffectation(String readLine) {
+        return readLine.contains("[") && readLine.contains("]") && readLine.contains("=") && (readLine.indexOf("=") > readLine.indexOf("["));
+    }
+
+    private void checkIsKeyWord(String s) throws ScriptErrorException {
+        for (int i = 0; i < keyWord.length; i++) {
+            if (s.startsWith(keyWord[i])) {
+                throw new ScriptErrorException("<Error: unexpected " + keyWord[i] + ">");
+            }
+        }
+    }
+
+    public static void checkIsKeyWordOrTrueFalse(String s) throws ScriptErrorException {
+        for (int i = 0; i < keyWord.length; i++) {
+            if (s.startsWith(keyWord[i])) {
+                throw new ScriptErrorException("<Error: unexpected " + keyWord[i] + ">");
+            }
+        }
+        if (s.equals("true") || s.equals("false")) {
+            throw new ScriptErrorException("<Error: unexpected true or false >");
+        }
+
+    }
+
+    private void checkBegin(String readLine) throws ScriptErrorException {
+        if (!readLine.equals("begin")) {
+            throw new ScriptErrorException("<Syntax error: No begin statement>");
+        }
+    }
+
+    private void checkEnd(String readLine) throws ScriptErrorException {
+        if (!readLine.equals("end")) {
+            throw new ScriptErrorException("<Syntax error: No end statement>");
+        }
+    }
+
+    private void checkEndOrElse(String readLine, Reader reader) throws ScriptErrorException {
+        if (readLine.contains("else")) {
+            skipToElseOrEndIf(reader);
+        } else if (!readLine.equals("endif")) {
+            throw new ScriptErrorException("<Error expected endif>");
+        }
+
+    }
+
+    private void checkEndThread(String readLine) throws ScriptErrorException {
+        if (!readLine.equals("endthread")) {
+            throw new ScriptErrorException("<Syntax error: No endthread statement>");
+        }
+    }
+
+    private void checkEndWhile(String readLine) throws ScriptErrorException {
+        if (!readLine.equals("endwhile")) {
+            throw new ScriptErrorException("<Syntax error: expected endwhile>");
+        }
+    }
+
+    private String getLoopInst(Reader reader) {
+        StringBuilder s = new StringBuilder();
+        int w = 0;
+        while (!reader.nextLine().equals("endwhile") || w > 0) {
+            if (reader.nextLine().contains("while ")) {
+                w++;
+            }
+            if (reader.nextLine().equals("endwhile")) {
+                w--;
+            }
+            s.append(reader.readLine() + "\n");
+        }
+        s.append(reader.readLine() + "\n");
+        return s.toString();
+    }
+
+    private String getOpBool(String exp) throws ScriptErrorException {
+        String op = null;
+        for (int i = 0; i < opB.length; i++) {
+            if (exp.contains(opB[i])) {
+                op = opB[i];
+                break;
+            }
+        }
+        if (op == null) {
+            throw new ScriptErrorException("<Syntax Error: expected boolean>");
+        }
+        return op;
+    }
+    /*Grammar:
+     * <Program>:= begin <seqInst> end
+     * <seqInst>:= <inst> {<inst>}
+     * <Inst>:= <affectation>|<read>|<write>|<cond>|<loop>|<thread>
+     * <cond>:= if <opbool> <seqInst> endif
+     * <thread>:= thread <seqInst> endthread
+     * <loop>:= while <opBool> <seqInst> endwhile
+     * <affectation>:= <var> = <expression>
+     * <read>:= read(<variable>)
+     * <write>:= write(<variable>|<expression>)
+     *
+     */
+}

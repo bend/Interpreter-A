@@ -1,0 +1,3 @@
+function test()
+write("as march")
+end

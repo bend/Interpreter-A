@@ -1,0 +1,4 @@
+include test2.script
+function test(a)
+write("lm")
+endfunction

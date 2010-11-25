@@ -1,0 +1,23 @@
+jButton13.text=*
+#NOI18N
+Form.background=167, 167, 167
+b0.text=0
+be.text==
+bd.text=/
+bpo.text=.
+bp.text=+
+bm.text=-
+b9.text=9
+b6.text=6
+b3.text=3
+b2.text=2
+b1.text=1
+b4.text=4
+b5.text=5
+b7.text=7
+b8.text=8
+resultField.text=
+#NOI18N
+resultField.font=LCD-Plain-24
+#NOI18N
+resultField.background=203, 232, 208

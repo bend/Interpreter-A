@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="3"/>
+    <Property name="background" type="java.awt.Color" resourceKey="Form.background"/>
+    <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
+    <Property name="resizable" type="boolean" value="false"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                  <Component id="resultField" alignment="0" max="32767" attributes="1"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="b7" min="-2" pref="50" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="b8" min="-2" pref="50" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="b9" min="-2" pref="50" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jButton13" min="-2" pref="50" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="b4" min="-2" pref="50" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="b5" min="-2" pref="50" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="b6" min="-2" pref="50" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="bm" min="-2" pref="50" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="b0" min="0" pref="0" max="32767" attributes="1"/>
+                          <Component id="b1" alignment="0" pref="50" max="32767" attributes="1"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="b2" min="-2" pref="50" max="-2" attributes="0"/>
+                          <Component id="bpo" min="-2" pref="50" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="b3" min="-2" pref="50" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="bp" min="-2" pref="50" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Component id="be" min="-2" pref="50" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="bd" min="-2" pref="50" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <Component id="resultField" min="-2" pref="49" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="b7" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="b8" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="b9" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="jButton13" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="b4" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="b5" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="b6" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="bm" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="b1" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="b2" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="b3" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="bp" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="b0" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="bpo" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="be" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+                  <Component id="bd" alignment="3" min="-2" pref="40" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JButton" name="b7">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="b7.text"/>
+        <Property name="name" type="java.lang.String" value="b7" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="b8">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="b8.text"/>
+        <Property name="name" type="java.lang.String" value="b8" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="b9">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="b9.text"/>
+        <Property name="name" type="java.lang.String" value="b9" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="b4">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="b4.text"/>
+        <Property name="name" type="java.lang.String" value="b4" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="b5">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="b5.text"/>
+        <Property name="name" type="java.lang.String" value="b5" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="b6">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="b6.text"/>
+        <Property name="name" type="java.lang.String" value="b6" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="b1">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="b1.text"/>
+        <Property name="name" type="java.lang.String" value="b1" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="b2">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="b2.text"/>
+        <Property name="name" type="java.lang.String" value="b2" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="b3">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="b3.text"/>
+        <Property name="name" type="java.lang.String" value="b3" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="b0">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="b0.text"/>
+        <Property name="name" type="java.lang.String" value="b0" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="bpo">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="bpo.text"/>
+        <Property name="name" type="java.lang.String" value="bpo" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="bm">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="bm.text"/>
+        <Property name="name" type="java.lang.String" value="bm" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton13">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="jButton13.text"/>
+        <Property name="name" type="java.lang.String" value="jButton13" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="bp">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="bp.text"/>
+        <Property name="name" type="java.lang.String" value="bp" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="be">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="be.text"/>
+        <Property name="name" type="java.lang.String" value="be" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="resultField">
+      <Properties>
+        <Property name="background" type="java.awt.Color" resourceKey="resultField.background"/>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="font" type="java.awt.Font" resourceKey="resultField.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="resultField.text"/>
+        <Property name="name" type="java.lang.String" value="resultField" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="bd">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="bd.text"/>
+        <Property name="name" type="java.lang.String" value="bd" noResource="true"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>

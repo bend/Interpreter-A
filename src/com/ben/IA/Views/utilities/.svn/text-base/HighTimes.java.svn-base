@@ -1,0 +1,55 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ben.IA.Views.utilities;
+
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.text.*;
+
+
+// A private subclass of the default highlight painter
+class MyHighlightPainter extends DefaultHighlighter.DefaultHighlightPainter {
+
+    public MyHighlightPainter(Color color) {
+        super(color);
+    }
+}
+
+public class HighTimes extends JFrame {
+
+    JTextField tF = new JTextField();
+    FlowLayout flowLayout1 = new FlowLayout();
+// An instance of the private subclass of the default highlight painter
+    Highlighter.HighlightPainter p = new MyHighlightPainter(Color.red);
+
+
+    public HighTimes() {
+        try {
+            jbInit();
+            setBounds(10, 10, 300, 300);
+            setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            Highlighter hL = tF.getHighlighter();
+            hL.addHighlight(2, 5, p);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        HighTimes highTimes = new HighTimes();
+
+    }
+
+    private void jbInit() throws Exception {
+        tF.setText("jTextField1");
+        tF.setColumns(15);
+        this.getContentPane().setLayout(flowLayout1);
+        this.getContentPane().add(tF, null);
+    }
+}

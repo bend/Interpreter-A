@@ -1,0 +1,5 @@
+
+editButton.text=Edit
+saveButton.text=Save
+deleteButton.text=Delete
+notesList.border.title=Title

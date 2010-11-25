@@ -1,0 +1,30 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ben.IA.brain;
+
+import com.ben.IA.brain.database.WordSerialDatabase;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+/**
+ * Compare un String avec les synonymes et regarde si il y a une ressemblance
+ * @author benoitdaccache
+ */
+class Matcher {
+
+    public static boolean matchString(String string1, String string2) {
+        if (string2.toLowerCase().contains(string1.toLowerCase())) {
+            return true;
+        }
+        ArrayList<String> arr = WordSerialDatabase.getInstance().getSynonyms(string1);
+        Iterator<String> it = arr.iterator();
+        while (it.hasNext()) {
+            if(string2.toLowerCase().contains(it.next().toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

@@ -1,0 +1,18 @@
+clearButton.text=Clear console
+consoleTextArea.border.title=Console
+executeButton.text=Execute
+#NOI18N
+consoleTextArea.background=0, 0, 0
+#NOI18N
+consoleTextArea.foreground=255, 255, 255
+#NOI18N
+consoleTextArea.border.titleColor=255, 255, 255
+stopButton.text=
+#NOI18N
+stopButton.icon=600px-stop_sign.png
+labelMem.text=
+jMenu1.text=File
+jMenu2.text=View
+memMenuItem.text=Show memory report
+saveAsMenuItem.text=Save as...
+openMenuItem.text=Open

@@ -1,0 +1,7 @@
+function Prod(n m acc)
+if m==1
+return acc
+else
+Prod(n m-1 acc*n)
+endif
+endfunction

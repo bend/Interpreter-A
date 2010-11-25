@@ -1,0 +1,197 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ben.IA.brain;
+
+import com.ben.IA.ErrorLogger.ErrorLogger;
+import com.ben.IA.Views.utilities.Scripter;
+import com.ben.IA.Views.utilities.TranslateView;
+import com.ben.IA.Views.notes.NoteCreator;
+import com.ben.IA.Views.notes.NotesViewer;
+import com.ben.IA.Views.utilities.SynonymsView;
+import com.ben.IA.brain.database.Notes;
+import com.ben.IA.brain.database.WordSerialDatabase;
+import java.util.Calendar;
+import java.util.Observable;
+import java.util.StringTokenizer;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author benoitdaccache
+ */
+public class Brain extends Observable {
+
+    private static Brain instance;
+    private BrainSettings brainSettings;
+    private String lastQuote = "";
+    private String lastAnswer = "";
+    private NotesViewer notesViewer = null;
+    private NoteCreator noteCreator;
+
+    public Brain() {
+        instance = this;
+        new ErrorLogger();
+        brainSettings = new BrainSettings();
+        brainSettings.refreshIdentity();
+    }
+
+    public static Brain getBrain() {
+        return instance;
+    }
+
+    public void performAsk(String text) {
+        String answer = null;
+        answer = checkDemand(text);
+        setChanged();
+        notifyObservers(answer);
+    }
+
+    public void restart() {
+        String name = JOptionPane.showInputDialog("Please Give me a name");
+        System.out.println(name);
+        brainSettings.newIdentity(name);
+    }
+
+    private void checkNotes() {
+        notesViewer = new NotesViewer(Notes.getInstance().getNotes());
+        notesViewer.setVisible(true);
+    }
+
+    private boolean containsKnowledgeData(String text) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    private boolean containsMath(String text) {
+        return containsNumerics(text) && containsOperator(text);
+    }
+
+    private boolean containsNumerics(String text) {
+        char[] c = text.toCharArray();
+        for (int i = 0; i < c.length; i++) {
+            if (Character.isDigit(c[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsOperator(String text) {
+        return text.contains("+") || text.contains("-") || text.contains("/") || text.contains("*");
+    }
+
+    private String getKnowledge(String text) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+
+    private boolean isQuestion(String str) {
+        return str.contains("?");
+    }
+
+    private boolean match(String text, String text2) {
+        return Matcher.matchString(text, text2);
+    }
+
+    private void openNoteCreator() {
+        noteCreator = new NoteCreator();
+        noteCreator.setVisible(true);
+    }
+
+
+    
+
+    private String checkDemand(String text) {
+        if (match("hey how are you?", lastAnswer)) {
+            if (match("you", text)) {
+                lastAnswer = "I'm fine thank you";
+                lastQuote = text;
+                return lastAnswer;
+            } else if (match("fine", text)) {
+                lastAnswer = "Good :)";
+                lastQuote = text;
+                return lastAnswer;
+            }else if (match("good", text) && match("not", text)) {
+                lastAnswer = "why aren't you feeling ok?";
+                return lastAnswer;
+            }
+        }
+        if (match("fine and you", lastAnswer)) {
+            if (match("good", text) && match("not", text)) {
+                lastAnswer = "why aren't you feeling ok?";
+                return lastAnswer;
+            } else if (match("good", text)) {
+                lastAnswer="good";
+                return lastAnswer;
+            }
+            lastQuote = text;
+        }
+        if (match("why aren't you feeling ok?", lastAnswer)) {
+            if (match("I ", text) || match("because", text)) {
+                lastAnswer = "Ok :s";
+                return lastAnswer;
+            }
+            lastQuote = text;
+        }
+        else if (match("how are you", lastQuote) && match("fine", text)) {
+            lastQuote = text;
+            return "Good :)";
+        }
+        if (isQuestion(text)) {
+            if (match("age", text)) {
+                return brainSettings.getAge();
+            }
+            if (match("name", text) && match("your", text)) {
+                return brainSettings.getName();
+            }
+            if (match("master", text) && match("your", text)) {
+                return "nobody, I'm not a slave...";
+            }
+            if (match("date", text)) {
+                return Calendar.getInstance().getTime().toString();
+            }
+            //if(containsKnowledgeData(text)){
+            //   return getKnowledge(text);
+            lastQuote = text;
+
+        } else if (match("bye", text) || match("I'm going", text)) {
+            lastQuote = text;
+            return "Ok  Bye Bye, see you soon:)";
+        }
+        if (match("hey", text) && match("are you", text) && match("how", text)) {
+            lastQuote = text;
+            lastAnswer = "fine and you ?";
+            return lastAnswer;
+        }
+        if (match("hey", text)) {
+            lastQuote = text;
+            lastAnswer = "hey how are you?";
+            return lastAnswer;
+        }
+        if (match("how are you", text)) {
+            lastQuote = text;
+            lastAnswer = "fine and you ?";
+            return lastAnswer;
+        }
+        if (match("add", text) && match("synonym", text)) {
+            lastQuote = text;
+            new SynonymsView(WordSerialDatabase.getInstance().getEntireDatabase()).setVisible(true);
+            return "ok";
+        }
+        if(match("consult",text) && match("note", text)){
+            checkNotes();
+            return "Ok";
+        }if (match("note", text)) {
+            lastQuote = text;
+            openNoteCreator();
+            return ("Ok I will save the note for you");
+        }if(match("translate",text)){
+            new TranslateView().setVisible(true);
+        return "";
+        }if(match("script",text)){
+            new Scripter().setVisible(true);
+            return "";
+        }return "what " + text.replace("\n", " ") + "?";
+    }
+}
